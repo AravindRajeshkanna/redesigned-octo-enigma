@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "lint": "eslint src/**/*.js",
-    "test": "jest --coverage",
+    "test": "jest --coverage --runInBand --detectOpenHandles --forceExit",
     "deploy": "echo 'Deploy command for API Gateway'"
   },
   "dependencies": {
