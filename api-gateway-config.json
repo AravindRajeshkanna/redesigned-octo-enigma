@@ -1,0 +1,33 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "My API Gateway Example",
+    "description": "API Gateway configuration for Node.js Express application"
+  },
+  "host": "api.example.com",
+  "basePath": "/",
+  "schemes": ["https"],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "API Health Check",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/data": {
+      "get": {
+        "summary": "Get Data",
+        "responses": {
+          "200": {
+            "description": "Data returned"
+          }
+        }
+      }
+    }
+  }
+}
