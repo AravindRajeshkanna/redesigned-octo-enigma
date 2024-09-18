@@ -1,0 +1,66 @@
+name: Deploy API Gateway
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  AWS_REGION: 'us-east-1' # AWS region
+  S3_BUCKET: 'api-gateway-config-bucket' # S3 bucket for config files
+  API_GATEWAY_NAME: 'MyAPIGateway'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Lint Code
+        run: npm run lint
+
+      - name: Run Tests
+        run: npm run test
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy API Gateway using AWS CLI
+        run: |
+          # Create or update the API Gateway
+          aws apigateway create-rest-api --name ${{ env.API_GATEWAY_NAME }} --region ${{ env.AWS_REGION }}
+
+          # Optional: Upload API Gateway configuration (like Swagger/OpenAPI) to S3 if needed
+          aws s3 cp api-gateway-config.json s3://${{ env.S3_BUCKET }}/api-gateway-config.json
+
+          # Deploy using Serverless framework (if used)
+          # npx serverless deploy --stage prod
+
+      - name: Health Check API
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" https://api.example.com/health
+
+      - name: Notify Deployment Success
+        if: success()
+        run: echo "API Gateway deployed successfully!"
+
+      - name: Notify Deployment Failure
+        if: failure()
+        run: echo "API Gateway deployment failed."
